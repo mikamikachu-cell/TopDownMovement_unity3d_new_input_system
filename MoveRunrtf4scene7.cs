@@ -1,203 +1,245 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
-public class MoveRunrtf4scene7 : MonoBehaviour
+public class Ruler_new_input_system_better : MonoBehaviour
 {
-    public float moveSpeed = 5f;//vitesse
-    public Rigidbody2D rb;
-    Vector2 movement;//déplacement
-    public Animator animator;//variable pour récupérer l'animator
-    //variables de direction
-    public float moveX ;//variable Horizontal
-    public float moveY ;//variable vertical
+    [SerializeField] private float speed = 5f;//vitesse du joueur
+    private ControllerInputActions playerInput;
+    private Rigidbody2D rb;//rigidbody
+    Animator animator;//animator pour jouer des animations
 
-//----------reconnaissance des directions
-// threshold
-    float threshold, threshold3 = 0.3f;
-    float threshold2, threshold4 = -0.3f;
-// prevframe
-    float prevFrame, prevFrame2, prevFrame3, prevFrame4;
-// currentframe
-    float currentFrame, currentFrame2,currentFrame3,currentFrame4;
-// //speed
-    float speed, speed2, speed3, speed4 ; 
-// relache
-    bool relacheDroite, relacheGauche, relacheHaut, relacheBas; 
-
-// --------VOID START----------------------------------------------------------------
-    void Start(){
-        animator.Play("rt4_idle_dos");
-    }
-//-------VOID UPDATE
-    void Update()
-    {
-       
-        //Mouvement de base
-        moveX = movement.x = Input.GetAxisRaw("Horizontal");//mouvement horizontal
-        moveY = movement.y = Input.GetAxisRaw("Vertical");//mouvement vertical
-
-
-        //------------ ANIMATIONS EN FONCTION DES DIRECTIONS-----------------
-        if (moveX == -1 && moveY == -1 ){
-           // Debug.Log("joueur descend et va à droite");
-            animator.Play("rt4_course_sans_balle_avant_droit");//animation avant droit
-        }
-        //-----------------------------------
-        else if (moveX == 1 && moveY == -1 ){
-           // Debug.Log("joueur descend et va à gauche");
-            animator.Play("rt4_course_sans_balle_avant_gauche");//animation avant gauche
-        }
-        else if (moveX == -1 && moveY == 1 ){
-          //  Debug.Log("joueur monte et va à droite");
-            animator.Play("rt4_course_sans_balle_arriere_droite");//animation arriere droite
-        }
-         else if (moveX == 1 && moveY == 1 ){
-          //  Debug.Log("joueur monte et va à gauche");
-            animator.Play("rt4_course_sans_balle_arriere_gauche");//animation arriere gauche
-          }
-        
-           //----------------ANIMATIONS EN FONCTION DES DIRECTIONS---------------------
-        else if (moveX == -1 ){//personnage va a gauche
-            animator.Play("rt4_course_sans_balle_vers_droite");//jouer course vers droite 
-            Debug.Log("course_droite");
-
-        }
-       else if (moveX == 1){//personnage va a droite
-            animator.Play("rt4_course_sans_balle_vers_gauche");//jouer course vers gauche  
-            Debug.Log("course_gauche");
-
-        }
-       else if (moveY == 1 ){//personnage descend
-            animator.Play("rt4_course_sans_balle_arriere");//course_arriere
-            Debug.Log("course_arriere");
-
-        }
-        else if (moveY == -1){//personnage monte
-            animator.Play("rt4_course_sans_balle_avant");//course avant
-            Debug.Log("course_avant");
-        }
-       
-
-        //---------------------TOUCHES RELACHEES-------------------------------
-        else if(Input.GetKeyUp("up")){//touche haut
-            animator.Play("rt4_idle_dos");//idle dos
-        }
-        else if(Input.GetKeyUp("down")){//touche bas
-            animator.Play("rt4_idle_face");//idle face
-        }
-        else if(Input.GetKeyUp("right")){//touche droit
-            animator.Play("rt4_idle_gauche");//idle droit
-        }
-        else if(Input.GetKeyUp("left")){//touche gauche
-            animator.Play("rt4_idle_droite");//idle gauche
-        }
-               
-    
-    //----------------coté droit relaché 
-         
-         prevFrame = currentFrame; 
-         currentFrame = moveX; 
-         speed = currentFrame - prevFrame;
-        if (speed > threshold)
-        {
-            relacheDroite = true;
-        }
-        if (relacheDroite)
-        {
-            animator.Play("rt4_idle_droite");//idle gauche
-            relacheDroite = false;   
-        } 
-    //-----------Coté gauche relaché-------------
-        prevFrame2 = currentFrame2; 
-        currentFrame2 = moveX; 
-        speed2 = currentFrame2 - prevFrame2;
-        if (speed2 < threshold2)
-        {
-            relacheGauche = true;
-        }
-        if(relacheGauche)
-        {
-            animator.Play("rt4_idle_gauche");//idle droit
-            relacheGauche = false;  
-        }  
-    //-----coté haut relaché---
-
-        prevFrame3 = currentFrame3; 
-        currentFrame3 = moveY; 
-        speed3 = currentFrame3 - prevFrame3;
-     if (speed3 > threshold3)
-        {
-            relacheBas = true;
-        }
-     if(relacheBas)
-        {
-            animator.Play("rt4_idle_face");//idle droit
-            relacheBas = false;
-         
-        }
-    //-----côté bas relaché---
-         prevFrame4 = currentFrame4; 
-         currentFrame4 = moveY; 
-         speed4 = currentFrame4 - prevFrame4;
-       
-     if (speed4 < threshold4)
-        {
-            relacheHaut = true;
-        }
-    if(relacheHaut)
-        {
-            animator.Play("rt4_idle_dos");//idle droit
-            relacheHaut = false;
-
-        }
-    //---------côté Bas droite
-     if(speed4 < threshold4 && speed > threshold ){
-        relacheBas =true;
-        relacheDroite = true;
-    }
-     if(relacheBas && relacheDroite){
-        relacheBas = false; 
-        relacheDroite =false;
-        animator.Play("rt4_idle_dos_droite");
-      
-    }
-    // ---------côté Bas gauche
-     if(speed4 < threshold4 && speed2 < threshold2){
-        relacheBas = true;
-        relacheGauche = true;
-    }
-     if(relacheBas && relacheGauche){
-        relacheBas = false;
-        relacheGauche = false;
-        animator.Play("rt4_idle_dos_gauche");
-        
-    }
-     //---------coté Haut droite
-     if(speed3 > threshold3 && speed > threshold){
-        relacheHaut = true;
-        relacheDroite =true;
-    }
-     if(relacheHaut && relacheDroite){
-        relacheDroite = false;
-        relacheHaut = false;
-        animator.Play("rt4_idle_face_droite");
-       
-    }
-    // --------coté Haut gauche
-     if(speed3 > threshold3 && speed2 < threshold2 ){
-        relacheHaut   =  true;
-        relacheGauche = true;
-    }
-     if (relacheHaut && relacheGauche){
-        relacheHaut   =  false;
-        relacheGauche = false;
-        animator.Play("rt4_idle_face_gauche");   
-    }   
-    }
+    public GameObject cercleOrange; // si le cercle orange est visible
    
-    //----------VOID FIXEDUPDATE
-    void FixedUpdate(){
-        rb.MovePosition(rb.position+movement*moveSpeed*Time.fixedDeltaTime);
+    //Booleens
+    bool hautAppuye = false, basAppuye = false, droiteAppuye = false, gaucheAppuye = false;//appuyé
+    bool hautRelache = false, basRelache = false, droiteRelache = false, gaucheRelache = false;//relâché
+    
+      void Start(){
+        animator = GetComponent<Animator>();
+        animator.Play("ruler_idle_dos");
     }
+    
+    void Awake(){
+        playerInput = new ControllerInputActions();
+        rb = GetComponent<Rigidbody2D>();
+        InitAction();
+        
+    }
+    private void OnEnable(){ playerInput.Enable();}
+    private void OnDisable(){ playerInput.Disable();}
+
+    public void FixedUpdate(){
+        Vector2 moveInput = playerInput.Movement.MoveUP.ReadValue<Vector2>();
+        Vector2 moveInput2 = playerInput.Movement.MoveDown.ReadValue<Vector2>();
+        Vector2 moveInput3 = playerInput.Movement.MoveRight.ReadValue<Vector2>();
+        Vector2 moveInput4 = playerInput.Movement.MoveLeft.ReadValue<Vector2>();
+
+        rb.velocity = moveInput * speed + moveInput2 * speed+moveInput3 * speed+moveInput4 * speed;
+    }
+    public void InitAction(){
+        // UP
+        
+        playerInput.Movement.MoveUP.canceled += Movement_Up_canceled;
+        //DOWN
+        playerInput.Movement.MoveDown.canceled += Movement_Down_canceled;
+        //LEFT
+        playerInput.Movement.MoveRight.canceled +=  Movement_Right_canceled;
+        //RIGHT
+        playerInput.Movement.MoveLeft.canceled +=  Movement_Left_canceled;
+        //Acceleration
+        playerInput.Movement.accelerate.performed += Movement_accelerate_performed;
+        playerInput.Movement.accelerate.canceled += Movement_accelerate_canceled;
+    }
+//ACCELERATE
+public void Movement_accelerate_performed(InputAction.CallbackContext context){
+      cercleOrange.GetComponent<Renderer>().enabled = true;//rond orange est visible 
+      speed = 6f;
+   } 
+
+public void Movement_accelerate_canceled(InputAction.CallbackContext context){
+        cercleOrange.GetComponent<Renderer>().enabled = false;//rond orange invisible
+         speed = 5f;   
+   }
+//HAUT
+  public void Movement_Up_canceled(InputAction.CallbackContext context){
+        hautRelache = true;
+    }
+//DROITE
+public void Movement_Right_canceled(InputAction.CallbackContext context){
+     droiteRelache = true; 
 }
+//BAS
+public void Movement_Down_canceled(InputAction.CallbackContext context){
+            basRelache =true;
+}
+//GAUCHE
+public void Movement_Left_canceled(InputAction.CallbackContext context){
+    gaucheRelache = true;
+    animator.Play("ruler_idle_droite");//idle gauche
+}
+
+ void Update(){
+     
+     if(rb.velocity.x >0 && rb.velocity.y <0){//face gauche
+        if(cercleOrange.GetComponent<Renderer>().isVisible == false ){
+        animator.Play("ruler_course_avant_gauche"); 
+        }
+        if(cercleOrange.GetComponent<Renderer>().isVisible == true ){
+            animator.Play("ruler_sprint_face_gauche"); 
+        }
+     }
+     else if(rb.velocity.x >0 && rb.velocity.y >0){//dos gauche
+        print("gauche_dos");
+        if(cercleOrange.GetComponent<Renderer>().isVisible == false ){
+            animator.Play("ruler_course_arriere_gauche"); 
+        }
+        if(cercleOrange.GetComponent<Renderer>().isVisible == true ){
+            animator.Play("ruler_sprint_dos_gauche"); 
+        }
+     }
+     else if (rb.velocity.x <0 && rb.velocity.y <0){//face droit
+        print("droite face");
+         if(cercleOrange.GetComponent<Renderer>().isVisible == false ){
+        animator.Play("ruler_course_avant_droit");
+        }
+        if(cercleOrange.GetComponent<Renderer>().isVisible == true ){
+            animator.Play("ruler_sprint_face_droite"); 
+        }
+     }
+     else if (rb.velocity.x <0 && rb.velocity.y>0){//dos droit
+        print("droite dos"); 
+         if(cercleOrange.GetComponent<Renderer>().isVisible == false ){
+        animator.Play("ruler_course_arriere_droite"); 
+        
+        }
+        if(cercleOrange.GetComponent<Renderer>().isVisible == true ){
+            animator.Play("ruler_sprint_dos_droite"); 
+        }
+     }
+        
+      //directions
+     else  if (rb.velocity.x < 0){
+             droiteAppuye = true;  
+            //Debug.Log("va à droite");//droite pour le joueur
+        if(cercleOrange.GetComponent<Renderer>().isVisible == false){//si le cercle orange invisible
+                animator.Play("ruler_course_vers_droite");//jouer course vers droite
+        }
+        else if(cercleOrange.GetComponent<Renderer>().isVisible == true){//si le cercle orange visible
+            animator.Play("ruler_sprint_droite");
+        }}
+        else if(rb.velocity.x > 0){
+            //Debug.Log("va à gauche");//gauche pour le joueur
+             gaucheAppuye = true;
+             if (cercleOrange.GetComponent<Renderer>().isVisible == false){//si le cercle orange est invisible
+             animator.Play("ruler_course_vers_gauche");//jouer course vers droite 
+        }
+        else if(cercleOrange.GetComponent<Renderer>().isVisible == true){//si le cercle orange est visible
+        animator.Play("ruler_sprint_sans_balle_gauche");
+        }}
+         else if (rb.velocity.y < 0){
+            basAppuye = true;
+              if(cercleOrange.GetComponent<Renderer>().isVisible == true){
+                animator.Play("ruler_sprint_face"); 
+             }
+            else if(cercleOrange.GetComponent<Renderer>().isVisible == false){//si le cercle orange visible
+            animator.Play("ruler_course_face");//course avant
+             }}
+        else if(rb.velocity.y > 0){
+            //course sans balle dos
+            if(cercleOrange.GetComponent<Renderer>().isVisible == false){//si le cercle orange est invisible
+            Debug.Log("rond orange invisible");
+            animator.Play("ruler_course_dos");//course_arriere  
+            hautAppuye =true;
+        }
+         else if(cercleOrange.GetComponent<Renderer>().isVisible == true){//si le cercle orange est visible
+            animator.Play("ruler_sprint_dos");
+            
+        } }
+         //--------------------- Pressed------------------------------
+        else if(hautAppuye && droiteAppuye){  //haut et droite appuyés en même temps
+           if ((cercleOrange.GetComponent<Renderer>().isVisible == false)){
+            animator.Play("ruler_course_arriere_droite");
+           }   
+           else if((cercleOrange.GetComponent<Renderer>().isVisible == true)){
+            animator.Play("ruler_sprint_dos_droite");
+           }
+                hautAppuye =false ; 
+                droiteAppuye = false ;}
+        else if(hautAppuye  && gaucheAppuye){//haut et gauche appuyés en même temps
+            if(cercleOrange.GetComponent<Renderer>().isVisible == false){//si le cercle orange visible
+             animator.Play("ruler_course_arriere_gauche");//animation avant droit
+            }
+           else if(cercleOrange.GetComponent<Renderer>().isVisible == true){
+                animator.Play("ruler_sprint_dos_gauche");
+            }
+               hautAppuye = false; 
+               gaucheAppuye =false; 
+        }
+       else if(basAppuye && droiteAppuye){//bas et droit appuyés en même temps
+                if(cercleOrange.GetComponent<Renderer>().isVisible == false){//si le cercle orange invisible
+                    animator.Play("ruler_course_avant_gauche");
+                }
+               else if(cercleOrange.GetComponent<Renderer>().isVisible == true){//si le cercle orange est visible
+                    animator.Play("ruler_sprint_face_gauche");
+                }
+            basAppuye = false ;
+            droiteAppuye = false ;
+        }
+        else if(basAppuye && gaucheAppuye ){//bas et gauche appuyés en même temps
+         if(cercleOrange.GetComponent<Renderer>().isVisible == false){//si le cercle orange invisible
+            
+            animator.Play("ruler_course_avant_droite");
+             }
+            else if(cercleOrange.GetComponent<Renderer>().isVisible == true){//si le cercle orange est visible
+                animator.Play("ruler_sprint_face_droite");
+             }
+            basAppuye = false;
+            gaucheAppuye = false;
+        }
+        //-------------------------------Release--------------------------------
+        else if(hautRelache && droiteRelache && rb.velocity.x == 0 && rb.velocity.y == 0){ //haut et droit relachés
+       
+            animator.Play("ruler_idle_dos_gauche");
+            hautRelache = false;
+            droiteRelache = false; 
+        }
+        else if(hautRelache && gaucheRelache &&rb.velocity.x == 0 && rb.velocity.y == 0 ){
+            animator.Play("ruler_idle_dos_droite");
+            hautRelache = false;
+            gaucheRelache = false; 
+        }
+       else if(basRelache && droiteRelache &&rb.velocity.x == 0 && rb.velocity.y == 0){//bas et droite relachés
+            animator.Play("ruler_idle_face_gauche");
+            basRelache =false;
+            droiteRelache = false;
+        }
+        else if(basRelache && gaucheRelache && rb.velocity.x == 0 && rb.velocity.y == 0 ){//bas et gauche relachés
+            animator.Play("ruler_idle_face_droite");
+            basRelache = false;
+            gaucheRelache = false;
+        }
+        else if (basRelache && rb.velocity.y == 0 && rb.velocity.x == 0){
+                animator.Play("ruler_idle_face");//idle droit
+                basRelache = false; 
+
+        }
+        else if(hautRelache  && rb.velocity.y == 0 && rb.velocity.x == 0){
+             animator.Play("ruler_idle_dos");//idle dos
+             hautRelache = false;
+        }
+        else if (droiteRelache && rb.velocity.y == 0 && rb.velocity.x == 0){
+           animator.Play("ruler_idle_gauche");//idle gauche 
+           droiteRelache = false;
+        }
+        else if (gaucheRelache && rb.velocity.y == 0 && rb.velocity.x == 0){
+           animator.Play("ruler_idle_droite");//idle gauche 
+           gaucheRelache = false; 
+        }
+
+        }
+}
+
